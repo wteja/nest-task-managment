@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Put } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import CreateTaskDto from "./dto/create-task";
 import UpdateTaskStatusDto from "./dto/update-task-status";
 import Task from "./task.model";
@@ -23,7 +23,7 @@ export default class TaskController {
         return this.taskService.createTask(title, description);
     }
 
-    @Put(":id")
+    @Patch(":id/status")
     updateTaskStatus(@Param("id") id: string, @Body() { status }: UpdateTaskStatusDto): Task {
         return this.taskService.updateTaskStatus(id, status);
     }
