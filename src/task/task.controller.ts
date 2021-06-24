@@ -18,8 +18,8 @@ export default class TaskController {
     }
 
     @Post()
-    createTask(@Body() createTaskDto: createTaskDto) {
-        return this.taskService.createTask(createTaskDto.title, createTaskDto.description);
+    createTask(@Body("title") title: string, @Body("description") description: string) {
+        return this.taskService.createTask(title, description);
     }
 
     @Put(":id")
