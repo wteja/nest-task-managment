@@ -46,7 +46,7 @@ export default class TaskService {
      * @returns Updated task
      */
     updateTaskStatus(id: string, status: TaskStatus): Task {
-        const task = this.tasks.find(t => t.id === id);
+        const task = this.getTaskById(id);
         if(task) {
             task.status = status;
         }
