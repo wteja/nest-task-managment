@@ -76,6 +76,7 @@ export default class TaskService {
      * @param id Task ID
      */
     deleteTask(id): void {
-        this.tasks = this.tasks.filter(t => t.id !== id);
+        const found = this.getTaskById(id);
+        this.tasks = this.tasks.filter(t => t.id !== found.id);
     }
 }
