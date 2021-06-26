@@ -1,30 +1,36 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
-import Task, { TaskStatus } from "./task.model";
-import {v4 as uuid} from "uuid";
 import GetTasksFilterDto from "./dto/get-tasks-filter.dto";
+import { InjectRepository } from "@nestjs/typeorm";
+import { TaskRepository } from "./task.repository";
+import { Task } from "src/entities/task.entity";
+import { TaskStatus } from "./task-status.enum";
+import { Like } from "typeorm";
 
 @Injectable()
 export class TaskService {
-    private tasks: Task[] = [];
-
+    constructor(
+        @InjectRepository(TaskRepository)
+        private taskRepository: TaskRepository
+    ) { }
     /**
      * List all tasks
      */
-    getAllTasks(): Task[] {
-        return this.tasks;
+    getAllTasks(): Promise<Task[]> {
+        return this.taskRepository.find();
     }
 
-    getTasksWithFilter(filterDto: GetTasksFilterDto): Task[] {
+    getTasksWithFilter(filterDto: GetTasksFilterDto): Promise<Task[]> {
         const { search, status } = filterDto;
-        let tasks = this.getAllTasks();
+        let where = [];
         if(search) {
             const s = search.trim();
-            tasks = tasks.filter(t => t.title.includes(s) || t.description.includes(s));
+            where.push({ title: Like(`%${s}%`) })
+            where.push({ description: Like(`%${s}%`) })
         }
         if(status) {
-            tasks = tasks.filter(t => t.status === status);
+            where.push({status});
         }
-        return tasks;
+        return this.taskRepository.find({ where });
     }
 
     /**
@@ -32,9 +38,9 @@ export class TaskService {
      * @param id Task ID
      * @returns Task that requeste by ID
      */
-    getTaskById(id: string): Task {
-        const found =  this.tasks.find(t => t.id === id);
-        if(!found)
+    async getTaskById(id: number): Promise<Task> {
+        const found = await this.taskRepository.findOne(id)
+        if (!found)
             throw new NotFoundException("Task ID is not found.")
 
         return found;
@@ -46,15 +52,13 @@ export class TaskService {
      * @param description Task description
      * @returns Created task
      */
-    createTask(title: string, description: string): Task {
-        const task = {
-            id: uuid(),
-            title,
-            description,
-            status: TaskStatus.OPEN
-        };
-        this.tasks.push(task);
-        return task;
+    async createTask(title: string, description: string): Promise<Task> {
+        const task = new Task();
+        task.title = title;
+        task.description = description;
+        task.status = TaskStatus.OPEN;
+        await task.save();
+        return task
     }
 
     /**
@@ -63,11 +67,10 @@ export class TaskService {
      * @param status Task Status
      * @returns Updated task
      */
-    updateTaskStatus(id: string, status: TaskStatus): Task {
-        const task = this.getTaskById(id);
-        if(task) {
-            task.status = status;
-        }
+    async updateTaskStatus(id: number, status: TaskStatus): Promise<Task> {
+        const task = await this.getTaskById(id);
+        task.status = status;
+        task.save();
         return task;
     }
 
@@ -75,8 +78,8 @@ export class TaskService {
      * Delete task by ID.
      * @param id Task ID
      */
-    deleteTask(id): void {
-        const found = this.getTaskById(id);
-        this.tasks = this.tasks.filter(t => t.id !== found.id);
+    async deleteTask(id: number): Promise<void> {
+        const found = await this.getTaskById(id);
+        await this.taskRepository.remove(found)
     }
 }
