@@ -2,7 +2,8 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Query, UsePipes, Val
 import CreateTaskDto from "./dto/create-task.dto";
 import GetTasksFilterDto from "./dto/get-tasks-filter.dto";
 import UpdateTaskStatusDto from "./dto/update-task-status.dto";
-import Task from "./task.model";
+import TaskStatusValidationPipe from "./pipes/task-status-validation-pipe";
+import Task, { TaskStatus } from "./task.model";
 import TaskService from "./task.service";
 
 @Controller("/tasks")
@@ -30,7 +31,7 @@ export default class TaskController {
     }
 
     @Patch(":id/status")
-    updateTaskStatus(@Param("id") id: string, @Body() { status }: UpdateTaskStatusDto): Task {
+    updateTaskStatus(@Param("id") id: string, @Body("status", TaskStatusValidationPipe) status: TaskStatus): Task {
         return this.taskService.updateTaskStatus(id, status);
     }
 
