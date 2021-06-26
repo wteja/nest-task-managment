@@ -1,7 +1,14 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { getTypeOrmModuleOptions } from './config/typeorm.config';
 import TaskModule from './task/task.module';
 
 @Module({
-  imports: [TaskModule],
+  imports: [
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot(getTypeOrmModuleOptions()),
+    TaskModule
+  ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -4,7 +4,7 @@ import {v4 as uuid} from "uuid";
 import GetTasksFilterDto from "./dto/get-tasks-filter.dto";
 
 @Injectable()
-export default class TaskService {
+export class TaskService {
     private tasks: Task[] = [];
 
     /**
