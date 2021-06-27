@@ -12,11 +12,7 @@ export default class TaskController {
 
     @Get()
     getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto): Promise<Task[]> {
-        if(Object.keys(filterDto)) {
-            return this.taskService.getTasksWithFilter(filterDto);
-        } else {
-            return this.taskService.getAllTasks();
-        }
+        return this.taskService.getTasks(filterDto);
     }
 
     @Get(":id")
@@ -26,8 +22,8 @@ export default class TaskController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    createTask(@Body() { title, description }: CreateTaskDto) {
-        return this.taskService.createTask(title, description);
+    createTask(@Body() createTaskDto: CreateTaskDto) {
+        return this.taskService.createTask(createTaskDto);
     }
 
     @Patch(":id/status")

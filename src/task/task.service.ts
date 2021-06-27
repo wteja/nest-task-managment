@@ -5,6 +5,7 @@ import { TaskRepository } from "./task.repository";
 import { Task } from "src/entities/task.entity";
 import { TaskStatus } from "./task-status.enum";
 import { Like } from "typeorm";
+import CreateTaskDto from "./dto/create-task.dto";
 
 @Injectable()
 export class TaskService {
@@ -12,25 +13,9 @@ export class TaskService {
         @InjectRepository(TaskRepository)
         private taskRepository: TaskRepository
     ) { }
-    /**
-     * List all tasks
-     */
-    getAllTasks(): Promise<Task[]> {
-        return this.taskRepository.find();
-    }
 
-    getTasksWithFilter(filterDto: GetTasksFilterDto): Promise<Task[]> {
-        const { search, status } = filterDto;
-        let where = [];
-        if(search) {
-            const s = search.trim();
-            where.push({ title: Like(`%${s}%`) })
-            where.push({ description: Like(`%${s}%`) })
-        }
-        if(status) {
-            where.push({status});
-        }
-        return this.taskRepository.find({ where });
+    getTasks(filterDto: GetTasksFilterDto): Promise<Task[]> {
+        return this.taskRepository.getTasks(filterDto);
     }
 
     /**
@@ -48,17 +33,11 @@ export class TaskService {
 
     /**
      * Create new task.
-     * @param title Task title
-     * @param description Task description
+     * @param createTaskDto Create Task DTO
      * @returns Created task
      */
-    async createTask(title: string, description: string): Promise<Task> {
-        const task = new Task();
-        task.title = title;
-        task.description = description;
-        task.status = TaskStatus.OPEN;
-        await task.save();
-        return task
+    async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+        return this.taskRepository.createTask(createTaskDto)
     }
 
     /**
