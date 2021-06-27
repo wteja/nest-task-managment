@@ -19,8 +19,6 @@ export class TaskRepository extends Repository<Task> {
             query.andWhere('(task.title ILIKE :search OR task.description ILIKE :search)', { search: `%${s}%` })
         }
 
-        console.log(query);
-
         return await query.getMany();
     }
 
