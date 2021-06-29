@@ -10,7 +10,7 @@ import TaskModule from './task/task.module';
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot(getTypeOrmModuleOptions()),
     AuthModule,
-    TaskModule
+    TaskModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
