@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { User } from './user.entity';
 import { UserRepository } from './user.repository';
 
 @Injectable()
@@ -12,5 +13,9 @@ export class AuthService {
 
     signUp(authCredentialsDto: AuthCredentialsDto): Promise<void> {
         return this.userRepository.signUp(authCredentialsDto);
+    }
+
+    signIn(authCredentialsDto: AuthCredentialsDto): Promise<User> {
+        return this.userRepository.validateUserPassword(authCredentialsDto);
     }
 }
