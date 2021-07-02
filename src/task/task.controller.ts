@@ -24,7 +24,7 @@ import { TaskService } from './task.service';
 @Controller('/tasks')
 @UseGuards(AuthGuard())
 export default class TaskController {
-  constructor(private taskService: TaskService) {}
+  constructor(private taskService: TaskService) { }
 
   @Get()
   getTasks(
@@ -35,8 +35,8 @@ export default class TaskController {
   }
 
   @Get(':id')
-  getTaskById(@Param('id') id: number): Promise<Task> {
-    return this.taskService.getTaskById(id);
+  getTaskById(@Param('id') id: number, @GetUser() user: User): Promise<Task> {
+    return this.taskService.getTaskById(id, user);
   }
 
   @Post()
@@ -44,7 +44,7 @@ export default class TaskController {
   createTask(
     @Body() createTaskDto: CreateTaskDto,
     @GetUser() user: User
-    ) {
+  ) {
     return this.taskService.createTask(createTaskDto, user);
   }
 
@@ -52,12 +52,15 @@ export default class TaskController {
   updateTaskStatus(
     @Param('id') id: number,
     @Body('status', TaskStatusValidationPipe) status: TaskStatus,
+    @GetUser() user: User
   ): Promise<Task> {
-    return this.taskService.updateTaskStatus(id, status);
+    return this.taskService.updateTaskStatus(id, status, user);
   }
 
   @Delete(':id')
-  deleteTask(@Param('id') id: number): void {
-    this.taskService.deleteTask(id);
+  deleteTask(
+    @Param('id') id: number,
+    @GetUser() user: User): void {
+    this.taskService.deleteTask(id, user);
   }
 }
